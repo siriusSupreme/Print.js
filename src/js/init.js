@@ -27,14 +27,12 @@ export default {
             gridHeaderStyle: 'font-weight: bold; padding: 5px; border: 1px solid #dddddd;',
             gridStyle: 'border: 1px solid lightgray; margin-bottom: -1px;',
             showModal: false,
-            onError: error => {
-                throw error
-            },
+            onError: (error) => { throw error },
+            onBeforePrint: null,
             onLoadingStart: null,
             onLoadingEnd: null,
             onPrintDialogClose: null,
             onPdfOpen: null,
-            onBeforePrint: null,
             onBrowserIncompatible: () => true,
             modalMessage: 'Retrieving Document...',
             frameId: 'printJS',
@@ -48,7 +46,7 @@ export default {
             css: null,
             style: null,
             scanStyles: true,
-            base64: false,
+            base64: false
         }
 
         // Check if a printable document or object was supplied
@@ -64,9 +62,9 @@ export default {
                 break
             case 'object':
                 params.printable = args.printable
-                params.fallbackPrintable =
-                    typeof args.fallbackPrintable !== 'undefined' ? args.fallbackPrintable : params.printable
                 params.base64 = typeof args.base64 !== 'undefined'
+                params.fallbackPrintable = typeof args.fallbackPrintable !== 'undefined' ? args.fallbackPrintable : params.printable
+                params.fallbackPrintable = params.base64 ? `data:application/pdf;base64,${params.fallbackPrintable}` : params.fallbackPrintable
                 for (var k in params) {
                     if (k === 'printable' || k === 'fallbackPrintable' || k === 'base64') continue
 
