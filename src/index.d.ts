@@ -36,6 +36,7 @@ declare namespace printJS {
     onError?: ( error: any ) => void;
     onPrintDialogClose?: () => void;
     onPdfOpen?: () => void;
+    base64?: boolean;
   }
 }
 
