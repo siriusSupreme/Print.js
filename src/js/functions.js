@@ -26,7 +26,7 @@ export function collectStyles (element, params) {
     }
   })
 
-  // Print friendly defaults (deprecated)
+  // Print friendly defaults
   elementStyle += 'max-width: ' + params.maxWidth + 'px !important;' + params.font_size + ' !important;'
 
   return elementStyle
@@ -39,27 +39,68 @@ function targetStylesMatch (styles, value) {
   return false
 }
 
-export function addHeader (printElement, params) {
-  // Create the header container div
-  let headerContainer = document.createElement('div')
+export function loopNodesCollectStyles (elements, params) {
+  for (let n = 0; n < elements.length; n++) {
+    let currentElement = elements[n]
 
-  // Check if the header is text or raw html
-  if (isRawHTML(params.header)) {
-    headerContainer.innerHTML = params.header
-  } else {
-    // Create header element
-    let headerElement = document.createElement('h1')
+    // Check if we are skiping this element
+    if (params.ignoreElements.indexOf(currentElement.getAttribute('id')) !== -1) {
+      currentElement.parentNode.removeChild(currentElement)
+      continue
+    }
 
-    // Create header text node
-    let headerNode = document.createTextNode(params.header)
+    // Form Printing - check if is element Input
+    let tag = currentElement.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+      // Save style to variable
+      let textStyle = collectStyles(currentElement, params)
 
-    // Build and style
-    headerElement.appendChild(headerNode)
-    headerElement.setAttribute('style', params.headerStyle)
-    headerContainer.appendChild(headerElement)
+      // Remove INPUT element and insert a text node
+      let parent = currentElement.parentNode
+
+      // Get text value
+      let textNode = tag === 'SELECT'
+        ? document.createTextNode(currentElement.options[currentElement.selectedIndex].text)
+        : document.createTextNode(currentElement.value)
+
+      // Create text element
+      let textElement = document.createElement('div')
+      textElement.appendChild(textNode)
+
+      // Add style to text
+      textElement.setAttribute('style', textStyle)
+
+      // Add text
+      parent.appendChild(textElement)
+
+      // Remove input
+      parent.removeChild(currentElement)
+    } else {
+      // Get all styling for print element
+      currentElement.setAttribute('style', collectStyles(currentElement, params))
+    }
+
+    // Check if more elements in tree
+    let children = currentElement.children
+
+    if (children && children.length) {
+      loopNodesCollectStyles(children, params)
+    }
   }
+}
 
-  printElement.insertBefore(headerContainer, printElement.childNodes[0])
+export function addHeader (printElement, header, headerStyle) {
+  // Create header element
+  let headerElement = document.createElement('h1')
+
+  // Create header text node
+  let headerNode = document.createTextNode(header)
+
+  // Build and style
+  headerElement.appendChild(headerNode)
+  headerElement.setAttribute('style', headerStyle)
+
+  printElement.insertBefore(headerElement, printElement.childNodes[0])
 }
 
 export function cleanUp (params) {

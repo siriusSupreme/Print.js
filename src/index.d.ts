@@ -1,5 +1,5 @@
-declare function printJS ( configuration: printJS.Configuration ): void;
-declare function printJS ( source: string, type?: printJS.PrintTypes ): void;
+declare function printJS(configuration: printJS.Configuration): void;
+declare function printJS(source: string, type?: printJS.PrintTypes): void;
 
 declare namespace printJS {
   type PrintTypes = 'pdf' | 'html' | 'image' | 'json' | 'raw-html';
@@ -22,7 +22,6 @@ declare namespace printJS {
     gridHeaderStyle?: string;
     gridStyle?: string;
     showModal?: boolean;
-    onBeforePrint?: ( Iiframe: HTMLIFrameElement ) => void;
     onLoadingStart?: () => void;
     onLoadingEnd?: () => void;
     modalMessage?: string;
@@ -33,10 +32,9 @@ declare namespace printJS {
     css?: string | string[];
     style?: string;
     scanStyles?: boolean;
-    onError?: ( error: any ) => void;
+    onError?: (error: any) => void;
     onPrintDialogClose?: () => void;
     onPdfOpen?: () => void;
-    base64?: boolean;
   }
 }
 

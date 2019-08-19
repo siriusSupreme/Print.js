@@ -5,8 +5,7 @@ export default {
   print: (params, printFrame) => {
     // Check if we have base64 data
     if (params.base64) {
-      const bytesArray = Uint8Array.from(atob(params.printable), c => c.charCodeAt(0))
-      createBlobAndPrint(params, printFrame, bytesArray)
+      createBlobAndPrint(params, printFrame, params.printable)
       return
     }
 

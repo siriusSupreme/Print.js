@@ -10,31 +10,57 @@ export default {
     }
 
     // Create printable element (container)
-    params.printableElement = document.createElement('div')
+    let printableElement = document.createElement('div')
+    printableElement.setAttribute('style', 'width:100%')
 
-    // Create all image elements and append them to the printable container
-    params.printable.forEach(src => {
-      // Create the image element
-      let img = document.createElement('img')
-      img.setAttribute('style', params.imageStyle)
+    // Load images and append
+    loadImagesAndAppendToPrintableElement(printableElement, params).then(() => {
+      // Check if we are adding a header
+      if (params.header) addHeader(printableElement, params.header, params.headerStyle)
 
-      // Set image src with the file url
-      img.src = src
+      // Store html data
+      params.htmlData = printableElement.outerHTML
 
-      // Create the image wrapper
+      // Print image
+      Print.send(params, printFrame)
+    })
+  }
+}
+
+function loadImagesAndAppendToPrintableElement (printableElement, params) {
+  let promises = []
+
+  params.printable.forEach((image, index) => {
+    // Create the image element
+    let img = document.createElement('img')
+
+    // Set image src with image file url
+    img.src = image
+
+    // Load image
+    promises.push(loadImageAndAppendToPrintableElement(printableElement, params, img, index))
+  })
+
+  return Promise.all(promises)
+}
+
+function loadImageAndAppendToPrintableElement (printableElement, params, img, index) {
+  return new Promise(resolve => {
+    img.onload = () => {
+      // Create image wrapper
       let imageWrapper = document.createElement('div')
+      imageWrapper.setAttribute('style', params.imageStyle)
 
-      // Append image to the wrapper element
+      img.setAttribute('style', 'width:100%;')
+      img.setAttribute('id', 'printableImage' + index)
+
+      // Append image to wrapper element
       imageWrapper.appendChild(img)
 
-      // Append wrapper to the printable element
-      params.printableElement.appendChild(imageWrapper)
-    })
+      // Append wrapper element to printable element
+      printableElement.appendChild(imageWrapper)
 
-    // Check if we are adding a print header
-    if (params.header) addHeader(params.printableElement, params)
-
-    // Print image
-    Print.send(params, printFrame)
-  }
+      resolve()
+    }
+  })
 }
